@@ -73,12 +73,146 @@ class ShapesDemoScreen extends StatelessWidget {
                 size: const Size(double.infinity, 300),
               ),
             ),
+            const SizedBox(height: 20),
+            const Text(
+              'Task 4: Emoji Selection & Drawing',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            EmojiSelectionWidget(),
           ],
         ),
       ),
     );
   }
 }
+
+// --- Emoji Selection Widget and Painters ---
+
+class EmojiSelectionWidget extends StatefulWidget {
+  @override
+  State<EmojiSelectionWidget> createState() => _EmojiSelectionWidgetState();
+}
+
+class _EmojiSelectionWidgetState extends State<EmojiSelectionWidget> {
+  String _selectedEmoji = 'party';
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Text('Choose Emoji: '),
+            DropdownButton<String>(
+              value: _selectedEmoji,
+              items: const [
+                DropdownMenuItem(value: 'party', child: Text('Party Face')),
+                DropdownMenuItem(value: 'heart', child: Text('Heart')),
+              ],
+              onChanged: (value) {
+                if (value != null) {
+                  setState(() {
+                    _selectedEmoji = value;
+                  });
+                }
+              },
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        SizedBox(
+          height: 250,
+          child: CustomPaint(
+            painter: _selectedEmoji == 'party'
+                ? PartyFacePainter()
+                : HeartPainter(),
+            size: const Size(double.infinity, 250),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class PartyFacePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final faceRadius = 60.0;
+
+    // Draw face
+    final facePaint = Paint()..color = Colors.yellow;
+    canvas.drawCircle(center, faceRadius, facePaint);
+
+    // Draw eyes
+    final eyePaint = Paint()..color = Colors.black;
+    canvas.drawCircle(center.translate(-20, -15), 8, eyePaint);
+    canvas.drawCircle(center.translate(20, -15), 8, eyePaint);
+
+    // Draw smile
+    final smilePaint = Paint()
+      ..color = Colors.black
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4;
+    final smileRect = Rect.fromCenter(center: center.translate(0, 10), width: 40, height: 25);
+    canvas.drawArc(smileRect, 0.1 * pi, 0.8 * pi, false, smilePaint);
+
+    // Draw party hat
+    final hatPath = Path()
+      ..moveTo(center.dx, center.dy - faceRadius)
+      ..lineTo(center.dx - 25, center.dy - faceRadius - 50)
+      ..lineTo(center.dx + 25, center.dy - faceRadius - 50)
+      ..close();
+    final hatPaint = Paint()..color = Colors.purple;
+    canvas.drawPath(hatPath, hatPaint);
+
+    // Draw hat band
+    final bandPaint = Paint()..color = Colors.white;
+    canvas.drawRect(Rect.fromLTWH(center.dx - 15, center.dy - faceRadius - 10, 30, 8), bandPaint);
+
+    // Draw confetti
+    final confettiColors = [Colors.red, Colors.green, Colors.blue, Colors.orange, Colors.pink];
+    final rand = Random(0);
+    for (int i = 0; i < 15; i++) {
+      final angle = rand.nextDouble() * 2 * pi;
+      final dist = faceRadius + 30 + rand.nextDouble() * 30;
+      final confettiOffset = center + Offset(cos(angle), sin(angle)) * dist;
+      final confettiPaint = Paint()..color = confettiColors[i % confettiColors.length];
+      canvas.drawCircle(confettiOffset, 5, confettiPaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class HeartPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2 + 20);
+    final heartPaint = Paint()..color = Colors.red;
+
+    final path = Path();
+    path.moveTo(center.dx, center.dy);
+    path.cubicTo(
+      center.dx + 50, center.dy - 60,
+      center.dx + 100, center.dy + 20,
+      center.dx, center.dy + 80,
+    );
+    path.cubicTo(
+      center.dx - 100, center.dy + 20,
+      center.dx - 50, center.dy - 60,
+      center.dx, center.dy,
+    );
+    canvas.drawPath(path, heartPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+// removed stray widget code
 
 class BasicShapesPainter extends CustomPainter {
   @override
