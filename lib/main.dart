@@ -159,18 +159,20 @@ class PartyFacePainter extends CustomPainter {
     final smileRect = Rect.fromCenter(center: center.translate(0, 10), width: 40, height: 25);
     canvas.drawArc(smileRect, 0.1 * pi, 0.8 * pi, false, smilePaint);
 
-    // Draw party hat
+    // Draw party hat (base on head, tip up)
+    final hatBaseY = center.dy - faceRadius;
+    final hatTipY = hatBaseY - 50;
     final hatPath = Path()
-      ..moveTo(center.dx, center.dy - faceRadius)
-      ..lineTo(center.dx - 25, center.dy - faceRadius - 50)
-      ..lineTo(center.dx + 25, center.dy - faceRadius - 50)
+      ..moveTo(center.dx - 25, hatBaseY) // left base
+      ..lineTo(center.dx + 25, hatBaseY) // right base
+      ..lineTo(center.dx, hatTipY) // tip
       ..close();
     final hatPaint = Paint()..color = Colors.purple;
     canvas.drawPath(hatPath, hatPaint);
 
-    // Draw hat band
+    // Draw hat band (just above the face)
     final bandPaint = Paint()..color = Colors.white;
-    canvas.drawRect(Rect.fromLTWH(center.dx - 15, center.dy - faceRadius - 10, 30, 8), bandPaint);
+    canvas.drawRect(Rect.fromLTWH(center.dx - 15, hatBaseY - 8, 30, 8), bandPaint);
 
     // Draw confetti
     final confettiColors = [Colors.red, Colors.green, Colors.blue, Colors.orange, Colors.pink];
